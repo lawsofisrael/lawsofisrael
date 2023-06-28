@@ -1,7 +1,7 @@
 
 ### need long filenames in git 
 
-run: git config core.longpaths true
+run: `git config core.longpaths true`
 
 if it is too long for the os , put it in disk root, like c:\law
 
