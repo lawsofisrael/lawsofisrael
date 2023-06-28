@@ -11,7 +11,7 @@ what you need is both: `converted_docx` `original_docx`
 
 the files are from different source so might have minorly different structure. for conviniance they are seperated.
 
-### licence 
+### license 
 public domain
 
 ### the laws are public domain information.
