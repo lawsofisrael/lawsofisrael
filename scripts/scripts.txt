@@ -1,0 +1,190 @@
+scripts to paste to console
+
+nevo open
+paste to console
+
+let [url,hash]=location.href.split('#',2),[url2,q]=url.split('?',2);
+let a=q.split("&").map(x=>x.split('=',2));
+let o=a.reduce((state,x)=>{state[x[0]]=x;return state},{}); 
+if(!o.page)
+    a.splice(1,0,['page','1'])
+if(!o.pagesize)
+    a.splice(2,0,['pagesize','50'])
+o=a.reduce((state,x)=>{state[x[0]]=x;return state},{}); 
+let start = parseInt(prompt('start',o.page[1]));
+let end =parseInt(prompt('end',document.querySelector('nav.paging a:nth-last-child(2)').innerText));
+o.pagesize[1]=50;
+for(let i=start;i<=end;i++) {o.page[1]=i; open(url2+'?'+a.map(x=>x.join('=')).join('&')+'#'+hash); }
+
+
+
+
+
+
+nevo save:
+
+craete and use bookmark . Bookmarklet Maker https://caiorss.github.io/bookmarklet-maker/
+
+javascript:(function() { async function docurl(id){const t= await (await fetch(`/ajax/laws/published/nevoid/${id}`)).text();  return `/law_word/law00/${t}.docx`; }; async function addlnk(nevolink){ if(nevolink.parentNode.querySelectorAll('.docLink').length) return;const url=await docurl(nevolink.hash.substring(2)); nevolink.insertAdjacentHTML('afterend',`\n<a class="textLink docLink" href="${url}" target="_blank"> doc </a>\n`)} let nevos=[...document.querySelectorAll('.nevoLink')]; function download(text, file_name, type) { var blob = new Blob([text], {type: type}); if (typeof navigator.msSaveBlob == "function") return navigator.msSaveBlob(blob, file_name); var saver = document.createElementNS("http://www.w3.org/1999/xhtml", "a"); var blobURL = saver.href = URL.createObjectURL(blob), body = document.body; saver.download = file_name; body.appendChild(saver); saver.dispatchEvent(new MouseEvent("click")); body.removeChild(saver); URL.revokeObjectURL(blobURL);} let pagenum=document.querySelector('nav.paging a.active').innerText; Promise.all(nevos.map(addlnk)).then(function(){ download(document.querySelector('#searchResultsMain').innerHTML.replace(/href="\//g,'href="https://www.nevo.co.il/'), %60page_${'000'.substr(pagenum.length)+pagenum}.html%60, 'text/html'); }); }());
+
+
+
+
+nevo load all files:
+
+paste to console
+
+
+
+async function readFiles() {
+    const pickerOpts = {
+  types: [
+    {
+      description: "Images",
+      accept: {
+        "image/*": [".html", ".htm", ".txt"],
+      },
+    },
+  ],
+  excludeAcceptAllOption: false,
+  multiple: true,
+};
+ const handles=  await window.showOpenFilePicker(pickerOpts);
+ const files=await Promise.all(    handles.map( async(fileHandle)=>{
+        const file = await fileHandle.getFile();
+        const text = await file.text();
+        return {file,text};
+    } ) )
+ return files;
+}
+let files=await readFiles();
+//files.reverse();
+document.querySelector('#searchResultsMain').innerHTML=files.map(x=>x.text).join('\n\n')
+
+
+
+
+
+nevo download all:
+
+paste to console
+
+function downloadblob(blob, file_name) 
+{
+  if (typeof navigator.msSaveBlob == "function")
+   return navigator.msSaveBlob(blob, file_name); 
+  var saver = document.createElementNS("http://www.w3.org/1999/xhtml", "a");
+  var blobURL = saver.href = URL.createObjectURL(blob), body = document.body;
+  saver.download = file_name;
+  body.appendChild(saver);
+  saver.dispatchEvent(new MouseEvent("click"));
+  body.removeChild(saver);
+  URL.revokeObjectURL(blobURL);
+}
+
+let docs=document.querySelectorAll('.docLink')
+let re=/[<>:"/\%|?*]+/g;
+let docs2=[...docs].map(x=>[x,x.parentElement.parentElement.childNodes[4].data.trim().replace(/''/g,'"').replace(re,x=>encodeURIComponent(x))])
+for(doc of docs2){
+    let file_name=doc[1]+'.'+(doc[0].href.split('.').reverse()[0])
+    let blob=await (await fetch(doc[0].href)).blob();
+    downloadblob(blob, file_name) 
+}
+
+
+
+
+
+find missing:
+
+
+dump a json of filenames:
+
+paste to console:
+
+console.log(docs2.map(doc=>doc[1]+'.'+(doc[0].href.split('.').reverse()[0])))
+
+
+
+from vscode run check missing program
+
+
+paste to console fill in output missing.json 
+
+missing=[..output of missing program..]
+
+
+download misssing:
+
+paste to console
+
+docs3=docs2.map(doc=>[doc[0],doc[1],doc[1]+'.'+(doc[0].href.split('.').reverse()[0])])
+docs4=docs3.filter(doc=>missing.includes(doc[2]))
+for(doc of docs4){
+    let file_name=doc[1]+'.'+(doc[0].href.split('.').reverse()[0])
+    let blob=await (await fetch(doc[0].href)).blob();
+    downloadblob(blob, file_name) 
+}
+
+
+
+now manually take all files to your folder
+
+
+
+
+
+
+
+download by original filename (for amanot)
+
+function downloadblob(blob, file_name) 
+{
+  if (typeof navigator.msSaveBlob == "function")
+   return navigator.msSaveBlob(blob, file_name); 
+  var saver = document.createElementNS("http://www.w3.org/1999/xhtml", "a");
+  var blobURL = saver.href = URL.createObjectURL(blob), body = document.body;
+  saver.download = file_name;
+  body.appendChild(saver);
+  saver.dispatchEvent(new MouseEvent("click"));
+  body.removeChild(saver);
+  URL.revokeObjectURL(blobURL);
+}
+
+let docs=document.querySelectorAll('.docLink')
+let re=/[<>:"/\%|?*]+/g;
+let docs2=[...docs].map(x=>[x,x.parentElement.parentElement.childNodes[4].data.trim().replace(/''/g,'"').replace(re,x=>encodeURIComponent(x))])
+for(doc of docs2){
+    let file_name=(doc[0].href.split('/').reverse()[0])
+    let blob=await (await fetch(doc[0].href)).blob();
+    downloadblob(blob, file_name) 
+}
+
+
+
+
+download files of a book
+
+function downloadblob(blob, file_name) 
+{
+  if (typeof navigator.msSaveBlob == "function")
+   return navigator.msSaveBlob(blob, file_name); 
+  var saver = document.createElementNS("http://www.w3.org/1999/xhtml", "a");
+  var blobURL = saver.href = URL.createObjectURL(blob), body = document.body;
+  saver.download = file_name;
+  body.appendChild(saver);
+  saver.dispatchEvent(new MouseEvent("click"));
+  body.removeChild(saver);
+  URL.revokeObjectURL(blobURL);
+}
+let docs=document.querySelectorAll('.file')
+let re=/[<>:"/\%|?*]+/g;
+let docs2=[...docs].map(x=>[x,x.childNodes[4].data.trim().replace(/''/g,'"').replace(re,x=>encodeURIComponent(x))])
+for(doc of docs2){
+    let file_name1=(doc[0].href.split('/').reverse()[0]).split('.')
+    let file_name=file_name1[0]+' '+doc[1]+'.'+file_name1[1]
+    let blob=await (await fetch(doc[0].href)).blob();
+    downloadblob(blob, file_name) 
+}
+
+
