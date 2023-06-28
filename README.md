@@ -5,9 +5,16 @@ run: git config core.longpaths true
 
 if it is too long for the os , put it in disk root, like c:\law
 
+what you need is both:
+
+converted_docx
+original_docx
 
 
-this is public domain information.
+the files are from different source so might have minorly different structure. for conviniance they are seperated.
+
+
+the laws are public domain information.
 
 Israeli copyright law:
 
